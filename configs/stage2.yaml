@@ -1,0 +1,47 @@
+# vqwen-qformer stage 2: Linear (warm-started) + LoRA(Qwen3) on mix665k.
+# Vision + Q-Former + queries stay frozen — identical to MiniGPT-4 stage 2.
+
+blip2_bundle_path: /home/alpha/vqwen-qformer/models/blip2-frozen
+llm_model_path: /home/alpha/vqwen-qformer/models/Qwen3-4B
+load_stage1_projector: /home/alpha/vqwen-qformer/checkpoints/stage1/projector.bin
+json_path: /home/alpha/vqwen-qformer/data/stage2/llava_v1_5_mix665k.json
+image_root: /home/alpha/vqwen-qformer/data/stage2/images
+# When set, the model skips ViT-G + Q-Former at train time and reads
+# precomputed features from this dir (produced by scripts/05_cache_features.py).
+# Deterministic (frozen modules), quality-neutral, ~20 % wall-time speedup.
+cached_features_dir: /home/alpha/vqwen-qformer/data/stage2/qformer_cache
+
+conversation_format: qwen_chat
+model_max_length: 2048
+
+use_lora: true
+lora_r: 128
+lora_alpha: 256
+lora_dropout: 0.05
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+per_device_train_batch_size: 24
+gradient_accumulation_steps: 8     # global batch 192
+learning_rate: 2.0e-4              # LoRA lr (LLaVA-1.5 paper)
+projector_lr: 2.0e-5               # 10x smaller, continues stage-1 polish
+weight_decay: 0.0
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+num_train_epochs: 1
+bf16: true
+gradient_checkpointing: true
+attn_implementation: sdpa
+use_liger: true
+group_by_length: true
+
+dataloader_num_workers: 12
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_prefetch_factor: 4
+optim: adamw_torch_fused
+
+logging_steps: 10
+save_strategy: steps
+save_steps: 500
+save_total_limit: 5
+report_to: tensorboard

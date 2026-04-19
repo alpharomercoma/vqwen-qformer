@@ -1,0 +1,66 @@
+# Specialized LoRA fine-tune on the TikTok sludge-frame dataset.
+#
+# Non-destructive: loads the stage-1 projector, never touches checkpoints/stage1/.
+# Saves to a separate dir (checkpoints/tiktok-lora/).
+#
+# Uses the cached-features fast path so the ViT-G + Q-Former never runs during
+# training (deterministic, quality-neutral, ~20 % faster).
+
+blip2_bundle_path: /home/alpha/vqwen-qformer/models/blip2-frozen
+llm_model_path: /home/alpha/vqwen-qformer/models/Qwen3-4B
+load_stage1_projector: /home/alpha/vqwen-qformer/checkpoints/stage1/projector.bin
+
+json_path: /home/alpha/vqwen-qformer/data/tiktok_fps1/tiktok_train.json
+eval_json_path: /home/alpha/vqwen-qformer/data/tiktok_fps1/tiktok_validate.json
+image_root: /home/alpha/vqwen-qformer/data/tiktok_fps1/frames
+cached_features_dir: /home/alpha/vqwen-qformer/data/tiktok_fps1/qformer_cache
+
+conversation_format: qwen_chat
+model_max_length: 1024
+
+use_lora: true
+# v4: r=16 alpha=32 dropout=0.15 on a 7-8K sample dataset (5 frames/video).
+# Even less memorization capacity; combined with de-specified labels this
+# pushes the model to learn structural sludge detection rather than
+# show-name completion.
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.15
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+# Small dataset (~30 K samples). 2 epochs ≈ 500-800 steps — fast on H200.
+per_device_train_batch_size: 32
+gradient_accumulation_steps: 4      # global batch 128
+learning_rate: 2.0e-4               # LoRA
+projector_lr: 2.0e-5                # continues stage-1 polish
+weight_decay: 0.0
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+num_train_epochs: 10              # 1.4K samples -> 110 steps (was 22 at 2 epochs)
+bf16: true
+gradient_checkpointing: true
+attn_implementation: sdpa
+use_liger: true
+group_by_length: true
+
+dataloader_num_workers: 12
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_prefetch_factor: 4
+optim: adamw_torch_fused
+
+logging_steps: 10
+save_strategy: steps
+save_steps: 100
+save_total_limit: 5
+report_to: tensorboard
+
+# Eval + early-stop: use validate split to detect overfitting. Save the
+# best checkpoint (lowest eval_loss) and restore it at end-of-train.
+eval_strategy: steps
+eval_steps: 25                    # eval 4 times across the 110-step run
+per_device_eval_batch_size: 32
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+early_stopping_patience: 2

@@ -1,0 +1,39 @@
+[project]
+name = "vqwen-qformer"
+version = "0.1.0"
+description = "CLIP + Q-Former + Linear + Qwen3-4B — BLIP-2-style adapter bridged into a LLaVA-style LLM"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch==2.6.0",
+    "torchvision==0.21.0",
+    "transformers>=4.51.0,<5",
+    "accelerate>=1.0.0",
+    "datasets>=3.0.0",
+    "huggingface_hub[cli]>=0.25.0",
+    "pillow>=10.0.0",
+    "pyyaml>=6.0.0",
+    "sentencepiece>=0.2.0",
+    "tokenizers>=0.20.0",
+    "tensorboard>=2.17.0",
+    "numpy<2.0",
+    "hf-transfer>=0.1.9",
+    "python-dotenv>=1.2.2",
+    "peft>=0.19.1",
+    "liger-kernel>=0.7.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vqwen_qformer"]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+torchvision = { index = "pytorch-cu124" }

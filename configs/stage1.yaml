@@ -1,0 +1,42 @@
+# vqwen-qformer stage 1: train ONLY Linear projector on LLaVA-Pretrain 558k.
+# Vision (EVA-ViT-G) + Q-Former (BLIP-2) + queries + Qwen3-4B all FROZEN.
+# MiniGPT-4 recipe: stage 1 = visual-text alignment via a single Linear.
+
+blip2_bundle_path: /home/alpha/vqwen-qformer/models/blip2-frozen
+llm_model_path: /home/alpha/vqwen-qformer/models/Qwen3-4B
+json_path: /home/alpha/vqwen-qformer/data/LLaVA-Pretrain/blip_laion_cc_sbu_558k.json
+image_root: /home/alpha/vqwen-qformer/data/LLaVA-Pretrain/images
+
+conversation_format: plain
+model_max_length: 2048
+
+# Training — H200 141 GB. Stage-1 has only ~2M trainable params (Linear only) +
+# ViT-G fwd + Q-Former fwd + Qwen3 fwd. Sequence = 32 image tokens + ~100 text.
+# We can push batch size very high here.
+per_device_train_batch_size: 128
+gradient_accumulation_steps: 2     # global batch 256 (paper parity)
+learning_rate: 1.0e-4              # MiniGPT-4 stage-1 linear layer LR
+projector_lr: 1.0e-4
+weight_decay: 0.05
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+num_train_epochs: 1
+bf16: true
+gradient_checkpointing: false      # 2M trainable params — unnecessary
+attn_implementation: sdpa
+# Liger-Kernel wins even though Qwen3 is frozen: FLCE fuses lm_head + CE, and
+# backward still traverses that path to reach the projector. Saves ~15 GB on
+# Qwen3's 152k vocab at bs=128.
+use_liger: true
+
+dataloader_num_workers: 16
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_prefetch_factor: 4
+optim: adamw_torch_fused
+
+logging_steps: 10
+save_strategy: steps
+save_steps: 500
+save_total_limit: 5
+report_to: tensorboard
