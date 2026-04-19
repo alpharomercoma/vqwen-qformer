@@ -1,0 +1,10 @@
+{
+  "checkpoint": "/home/alpha/vqwen-qformer/checkpoints/tiktok-lora",
+  "n_total": 300,
+  "n_unparseable": 0,
+  "gt_correct": 231,
+  "gt_acc": 0.77,
+  "cleaned_correct": 242,
+  "cleaned_acc": 0.8066666666666666,
+  "overrides_applied": 29
+}

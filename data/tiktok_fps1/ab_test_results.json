@@ -1,0 +1,91 @@
+{
+  "n": 40,
+  "serial_time_s": 211.6,
+  "batched_time_s": 78.2,
+  "speedup": 2.71,
+  "byte_identical": 16,
+  "parsed_json_equal": 16,
+  "sludge_decisions_match": 39,
+  "layout_decisions_match": 40,
+  "pct_byte_identical": 40.0,
+  "pct_json_equal": 40.0,
+  "pct_sludge_match": 97.5,
+  "pct_layout_match": 100.0,
+  "diffs": [
+    {
+      "frame_path": "Non_Sludge_Batch_1/0-1RS_j4EYI_f7.jpg",
+      "serial": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A close-up shot shows a young man in a red hooded jacket looking at another person whose back is to the camera. The person in the foreground is holding a gun pointed at the man in red. The background is out of focus, showing a colorful wall and another figure in a red suit with a black mask.",
+        "explanation": "The frame shows a single, continuous scene with no multiple video streams or split-screen elements, so it is not sludge content."
+      },
+      "batched": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A close-up shot of a young man in a red hooded jacket looking at another person whose back is to the camera. The person in the foreground is holding a gun pointed at the man in red. The background is out of focus, showing a colorful wall and another figure in a red suit with a mask.",
+        "explanation": "The frame shows a single, continuous scene with no multiple video streams or split-screen elements, so it is not sludge content."
+      }
+    },
+    {
+      "frame_path": "Non_Sludge_Batch_1/0-1RS_j4EYI_f9.jpg",
+      "serial": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A close-up shot of a young man in a red jacket looking forward, with a hand holding a gun pointed at him from the foreground. In the background, figures in red hooded suits with black masks are visible. White text at the bottom reads, 'You're just a kid.'",
+        "explanation": "The frame shows a single, continuous scene with no multiple video streams or split-screen elements, so it is not sludge content."
+      },
+      "batched": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A close-up shot of a young man in a red jacket looking forward, with a hand holding a gun pointed at him from the foreground. In the background, figures in red hooded suits with black masks are visible. The text 'You're just a kid.' is displayed at the bottom of the frame.",
+        "explanation": "The image shows a single, continuous scene with no multiple video streams or split-screen elements, therefore it is not sludge content."
+      }
+    },
+    {
+      "frame_path": "Non_Sludge_Batch_1/0-1RS_j4EYI_f14.jpg",
+      "serial": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A blurry, black-and-white image of a person in a hooded garment holding a gun, with another person standing in the background. A cartoon skull with a hat is superimposed over the lower center of the frame.",
+        "explanation": "The image shows a single scene with a superimposed graphic, not multiple unrelated video streams, so it is not sludge content."
+      },
+      "batched": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A blurry, black-and-white image of a person in a hooded garment pointing a gun at another person in the distance. A cartoon skull with a hat is superimposed over the lower center of the frame.",
+        "explanation": "The image shows a single scene with a superimposed graphic, not multiple unrelated video streams, so it is not sludge content."
+      }
+    },
+    {
+      "frame_path": "Non_Sludge_Batch_1/07DlMlgCC4U_f7.jpg",
+      "serial": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A concert scene showing a performer with long blonde hair on stage, viewed from behind, with a large crowd in the background. In the foreground, a man with glasses and a beard is looking up at the stage. White text is overlaid at the top of the frame.",
+        "explanation": "The image shows a single, continuous scene from a concert, with no multiple video streams or split-screen elements, so it is not sludge content."
+      },
+      "batched": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A concert scene showing a performer with long blonde hair on stage, viewed from behind, with a large crowd in the background. In the foreground, a man with glasses and a beard is seen from the side, looking towards the stage. White text is overlaid at the top of the frame.",
+        "explanation": "The image shows a single, continuous scene from a concert, with no multiple video streams or split-screen elements, so it is not sludge content."
+      }
+    },
+    {
+      "frame_path": "Non_Sludge_Batch_1/07DlMlgCC4U_f4.jpg",
+      "serial": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A performer with blonde hair sings on stage into a microphone, wearing a black lace outfit, with a large crowd in the background. In the foreground, a man with glasses and a beard is visible, and white text overlaid at the top reads, 'security looking at sabrina like \"WTF IS THIS IM TRYNA GO HOME\"'.",
+        "explanation": "The image is a single, continuous scene from a concert, not a composite of multiple unrelated video streams, and therefore does not qualify as sludge content."
+      },
+      "batched": {
+        "sludge": "no",
+        "layout": "single_scene",
+        "description": "A performer with blonde hair sings on stage into a microphone, wearing a black lace outfit, with a large crowd in the background. In the foreground, a man with glasses and a beard is visible, and white text is overlaid at the top of the frame.",
+        "explanation": "The image shows a single, continuous scene from a concert, with no multiple video streams or split-screen elements, so it is not sludge content."
+      }
+    }
+  ]
+}

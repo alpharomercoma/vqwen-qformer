@@ -1,0 +1,54 @@
+{
+  "checkpoint": "/home/alpha/vqwen-qformer/checkpoints/tiktok-lora",
+  "mode": "classify",
+  "n_total": 300,
+  "n_covered": 300,
+  "n_correct": 259,
+  "n_unparseable": 0,
+  "n_errors": 0,
+  "accuracy": 0.8633333333333333,
+  "per_layout": {
+    "vertical": {
+      "n": 169,
+      "correct": 131,
+      "unparseable": 0,
+      "acc": 0.7751479289940828
+    },
+    "grid": {
+      "n": 4,
+      "correct": 2,
+      "unparseable": 0,
+      "acc": 0.5
+    },
+    "collage": {
+      "n": 2,
+      "correct": 2,
+      "unparseable": 0,
+      "acc": 1.0
+    },
+    "N/A": {
+      "n": 114,
+      "correct": 113,
+      "unparseable": 0,
+      "acc": 0.9912280701754386
+    },
+    "other": {
+      "n": 1,
+      "correct": 1,
+      "unparseable": 0,
+      "acc": 1.0
+    },
+    "picture-in-picture": {
+      "n": 8,
+      "correct": 8,
+      "unparseable": 0,
+      "acc": 1.0
+    },
+    "layered": {
+      "n": 2,
+      "correct": 2,
+      "unparseable": 0,
+      "acc": 1.0
+    }
+  }
+}
