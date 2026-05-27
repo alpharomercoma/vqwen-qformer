@@ -42,6 +42,9 @@ def main():
     p.add_argument("--dtype", default="bfloat16", choices=["float32","float16","bfloat16"])
     p.add_argument("--test_generate", action="store_true")
     p.add_argument("--test_image", default=None)
+    p.add_argument("--test_transcript", default=None,
+                   help="Audio transcript to include in the smoke prompt. Without it the "
+                        "v2 model behaves like vision-only and may flip predictions.")
     p.add_argument("--force", action="store_true")
     args = p.parse_args()
 
@@ -154,6 +157,10 @@ def main():
         tokenizer=tokenizer,
         num_query_tokens=None,
     )
+    # NB: Blip2Processor doesn't persist `processor.chat_template` through
+    # save_pretrained reliably in all transformers versions; the tokenizer's
+    # chat_template *does* persist, so always go through processor.tokenizer
+    # at inference time.
     processor.chat_template = qwen3_chat_template
 
     if args.test_generate:
@@ -163,8 +170,18 @@ def main():
         from PIL import Image
         img = Image.open(img_path).convert("RGB")
         m = model.to("cuda").eval()
-        msgs = [{"role":"user","content":[{"type":"image"},{"type":"text","text":"Is this sludge content? Answer yes or no."}]}]
-        prompt = processor.apply_chat_template(msgs, add_generation_prompt=True, tokenize=False)
+        # Include a synthetic transcript so the smoke matches training-time
+        # prompt layout. The v2 model was trained with an "Audio transcript:"
+        # preamble; omitting it produces systematically worse predictions.
+        transcript_preview = ("Audio transcript: " + (args.test_transcript or "")
+                              ) if args.test_transcript else ""
+        user_content = []
+        if args.test_transcript:
+            user_content.append({"type": "text", "text": f"Audio transcript: {args.test_transcript}"})
+        user_content.append({"type": "image"})
+        user_content.append({"type": "text", "text": "Is this sludge content? Answer yes or no."})
+        msgs = [{"role": "user", "content": user_content}]
+        prompt = processor.tokenizer.apply_chat_template(msgs, add_generation_prompt=True, tokenize=False)
         print(f"[smoke] prompt ({len(prompt)} chars, <image> count = {prompt.count(args.image_token)})", file=sys.stderr)
         inp = processor(text=prompt, images=img, return_tensors="pt")
         inp = {k: v.to("cuda") for k, v in inp.items()}

@@ -203,8 +203,20 @@ def main():
             target_modules=cfg.get("lora_target_modules"),
         )
 
-    # Projector is always trainable. Vision + Q-Former + queries remain frozen.
-    for p_ in model.projector.parameters(): p_.requires_grad_(True)
+    # Projector trainability is config-driven.
+    #  - Stage 1 (LLaVA-Pretrain alignment) trains the projector — this is the
+    #    only trainable module in stage 1, so the default `True` applies.
+    #  - Stage 2 TikTok (configs/tiktok_lora_v2.yaml) sets `train_projector:
+    #    false` to freeze the projector during LoRA fine-tuning. A controlled
+    #    ablation showed this slightly outperforms a trainable projector on
+    #    the TikTok task by preserving the broader stage-1 alignment.
+    #  - Vision + Q-Former + queries are always frozen (handled in model.__init__).
+    train_projector = cfg.get("train_projector", True)
+    for p_ in model.projector.parameters(): p_.requires_grad_(train_projector)
+    if train_projector:
+        print("[train] projector TRAINABLE")
+    else:
+        print("[train] projector FROZEN (stage-1 alignment preserved)")
 
     n_train = sum(p.numel() for p in model.parameters() if p.requires_grad)
     n_all = sum(p.numel() for p in model.parameters())

@@ -5,7 +5,7 @@ cd "$REPO_ROOT"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=false
 mkdir -p logs data/tiktok_fps1/qformer_cache
-exec /home/alpha/vqwen/.venv/bin/python scripts/05_cache_features.py \
+exec "$REPO_ROOT/.venv/bin/python" scripts/05_cache_features.py \
     --json_path data/tiktok_fps1/tiktok_train.json \
     --image_root data/tiktok_fps1/frames \
     --cache_dir data/tiktok_fps1/qformer_cache \

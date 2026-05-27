@@ -1,7 +1,10 @@
-# Specialized LoRA fine-tune on the TikTok sludge-frame dataset.
+# ABLATION: vision-only TikTok LoRA fine-tune (no audio transcript modality).
+# This is the configuration that produced `alpharomercoma/vqwen-qformer-tiktok`.
+# Kept as a baseline reference; the with-transcript run lives in
+# configs/tiktok_lora_v2.yaml.
 #
 # Non-destructive: loads the stage-1 projector, never touches checkpoints/stage1/.
-# Saves to a separate dir (checkpoints/tiktok-lora/).
+# Saves to a separate dir (checkpoints/tiktok-lora-ablation/).
 #
 # Uses the cached-features fast path so the ViT-G + Q-Former never runs during
 # training (deterministic, quality-neutral, ~20 % faster).

@@ -19,7 +19,7 @@ def load_trained_model(checkpoint_dir: str | Path,
     """Load a stage-1 or stage-2 checkpoint.
 
     Checkpoint layout (produced by QFormerTrainer._save):
-      projector.bin                  # trainable Linear state_dict
+      projector.bin                  # Linear state_dict (trained in stage 1)
       lora_adapter/                  # optional (stage-2 only)
       config.yaml                    # training yaml, contains blip2_bundle_path + llm_model_path
     """

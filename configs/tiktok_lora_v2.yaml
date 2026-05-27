@@ -1,0 +1,76 @@
+# v2 — TikTok LoRA fine-tune *with* the audio transcript modality.
+# Canonical stage-2 config. The vision-only baseline lives in
+# configs/tiktok_lora_ablation_no_transcript.yaml.
+#
+# Non-destructive: loads the stage-1 projector (downloaded by
+# scripts/10b_download_stage1_from_hf.py); writes to
+# checkpoints/tiktok-lora-v2/.
+
+blip2_bundle_path: /home/alpha/vqwen-qformer/models/blip2-frozen
+llm_model_path: /home/alpha/vqwen-qformer/models/Qwen3-4B
+load_stage1_projector: /home/alpha/vqwen-qformer/checkpoints/stage1/projector.bin
+
+json_path: /home/alpha/vqwen-qformer/data/tiktok_v2/tiktok_train.json
+eval_json_path: /home/alpha/vqwen-qformer/data/tiktok_v2/tiktok_validate.json
+image_root: /home/alpha/vqwen-qformer/data/tiktok_v2/frames
+cached_features_dir: /home/alpha/vqwen-qformer/data/tiktok_v2/qformer_cache
+
+conversation_format: qwen_chat
+model_max_length: 1024              # 32 image + ~150 transcript + ~50 prompt + ~50 answer ≪ 1024
+
+use_lora: true
+lora_r: 32                          # doubled vs. ablation — new transcript modality adds signal
+lora_alpha: 64
+lora_dropout: 0.10                  # loosened from 0.15; grounded labels reduce memorisation risk
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+# Stage-2 ablation finding: keeping the stage-1 projector frozen during LoRA
+# fine-tune slightly outperforms training it (preserves the broader visual-
+# language alignment learned on 558K LLaVA-Pretrain pairs, vs. drifting on
+# the narrower 35K sludge dataset). projector_lr below is therefore inert.
+train_projector: false
+
+per_device_train_batch_size: 32     # bs=64 OOM'd on H200 at seq=1024 + LoRA r=32 (the
+                                    # original plan estimate of 30 GB activations was too low)
+gradient_accumulation_steps: 4      # global batch 128 (unchanged)
+learning_rate: 2.0e-4
+projector_lr: 2.0e-5
+weight_decay: 0.0
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+num_train_epochs: 2                 # 1400 videos × ~25 frames extracted = ~35K samples; bs128 ⇒
+                                    # ~270 steps/epoch × 2 = ~540 steps total. (Note: the original
+                                    # plan assumed 7K samples / 6 epochs; revised after observing
+                                    # extractor produces ~25 frames/video, not 5.)
+bf16: true
+gradient_checkpointing: true        # required at bs=32+ for Qwen3-4B + LoRA r=32 (no-checkpoint
+                                    # OOM'd at 139 GB used out of 141 GB)
+# NOTE: started with sdpa for the bring-up run on this host (CUDA toolkit 13.0
+# vs torch cu124 makes a flash-attn source build risky); flip to
+# flash_attention_2 once a prebuilt FA2 wheel is verified to import.
+attn_implementation: sdpa
+use_liger: true
+group_by_length: true
+
+dataloader_num_workers: 16
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_prefetch_factor: 6
+optim: adamw_torch_fused
+
+logging_steps: 10
+save_strategy: steps
+save_steps: 50              # must equal eval_steps so the best-eval checkpoint
+                            # is actually persisted; otherwise load_best_model_at_end
+                            # promotes whichever checkpoint happened to be saved at
+                            # a save_step boundary, not the best-evaluating one.
+save_total_limit: 5
+report_to: tensorboard
+
+eval_strategy: steps
+eval_steps: 50
+per_device_eval_batch_size: 64
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+early_stopping_patience: 3

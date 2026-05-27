@@ -1,10 +1,11 @@
 """VQwenQFormerForCausalLM — MiniGPT-4-style adapter on top of Qwen3-4B.
 
   Image (224x224)
-    -> EVA-ViT-G/14         [FROZEN, from BLIP-2-opt-2.7b]  -> (B, 257, 1408)
-    -> Q-Former (12 layers) [FROZEN, from BLIP-2-opt-2.7b]  -> (B, 32, 768)
+    -> EVA-CLIP-G/14        [FROZEN, from BLIP-2-opt-2.7b]   -> (B, 257, 1408)
+    -> Q-Former (12 layers) [FROZEN, from BLIP-2-opt-2.7b]   -> (B, 32, 768)
        (queries pretrained on 129M image-text pairs + co-trained with OPT-2.7B)
-    -> Linear(768, 2560)    [TRAINABLE, 2M params]           -> (B, 32, 2560)
+    -> Linear(768, 2560)    [TRAINABLE stage-1; FROZEN stage-2; 2M params]
+                                                              -> (B, 32, 2560)
   -> splice into Qwen3-4B input embeddings at <image> sentinel
   -> Qwen3-4B LM            [FROZEN stage-1; LoRA-adapted stage-2]
 
