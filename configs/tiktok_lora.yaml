@@ -1,0 +1,56 @@
+blip2_bundle_path: /home/alpha/vqwen-qformer/models/blip2-frozen
+llm_model_path: /home/alpha/vqwen-qformer/models/Qwen3-4B
+load_stage1_projector: /home/alpha/vqwen-qformer/checkpoints/stage1/projector.bin
+
+json_path: /home/alpha/vqwen-qformer/data/tiktok_v2/tiktok_train.json
+eval_json_path: /home/alpha/vqwen-qformer/data/tiktok_v2/tiktok_validate.json
+image_root: /home/alpha/vqwen-qformer/data/tiktok_v2/frames
+cached_features_dir: /home/alpha/vqwen-qformer/data/tiktok_v2/qformer_cache
+
+conversation_format: qwen_chat
+model_max_length: 1024
+
+use_lora: true
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.25
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+train_projector: false
+
+per_device_train_batch_size: 32
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+projector_lr: 2.0e-5
+weight_decay: 0.05
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+max_steps: 200
+num_train_epochs: 2
+bf16: true
+gradient_checkpointing: true
+attn_implementation: sdpa
+use_liger: true
+group_by_length: true
+
+dataloader_num_workers: 16
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_prefetch_factor: 6
+optim: adamw_torch_fused
+
+logging_steps: 10
+save_strategy: steps
+save_steps: 50
+save_total_limit: 5
+report_to: tensorboard
+
+eval_strategy: steps
+eval_steps: 50
+per_device_eval_batch_size: 64
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+early_stopping_patience: 5
+
+output_dir: /home/alpha/vqwen-qformer/checkpoints/tiktok-lora

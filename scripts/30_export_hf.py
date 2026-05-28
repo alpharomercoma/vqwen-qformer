@@ -43,8 +43,7 @@ def main():
     p.add_argument("--test_generate", action="store_true")
     p.add_argument("--test_image", default=None)
     p.add_argument("--test_transcript", default=None,
-                   help="Audio transcript to include in the smoke prompt. Without it the "
-                        "v2 model behaves like vision-only and may flip predictions.")
+                   help="Audio transcript to include in the smoke prompt.")
     p.add_argument("--force", action="store_true")
     args = p.parse_args()
 
@@ -171,8 +170,7 @@ def main():
         img = Image.open(img_path).convert("RGB")
         m = model.to("cuda").eval()
         # Include a synthetic transcript so the smoke matches training-time
-        # prompt layout. The v2 model was trained with an "Audio transcript:"
-        # preamble; omitting it produces systematically worse predictions.
+        # prompt layout (the trained model expects an "Audio transcript:" preamble).
         transcript_preview = ("Audio transcript: " + (args.test_transcript or "")
                               ) if args.test_transcript else ""
         user_content = []
