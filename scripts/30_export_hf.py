@@ -202,6 +202,23 @@ def main():
     GenerationConfig(max_new_tokens=256, do_sample=False,
                      pad_token_id=tokenizer.pad_token_id,
                      eos_token_id=tokenizer.eos_token_id).save_pretrained(out)
+    # Post-save: tokenizer_config.json may contain `extra_special_tokens` as a
+    # list (an older serialization quirk). Newer transformers loaders treat it
+    # as a dict and crash with `AttributeError: 'list' object has no attribute
+    # 'keys'`. Move any contents to `additional_special_tokens` and drop the
+    # legacy field.
+    import json as _json
+    _tcfg_path = out / "tokenizer_config.json"
+    if _tcfg_path.exists():
+        _tcfg = _json.load(_tcfg_path.open())
+        _legacy = _tcfg.pop("extra_special_tokens", None)
+        if isinstance(_legacy, list) and _legacy:
+            _existing = _tcfg.get("additional_special_tokens") or []
+            _merged = list({*_existing, *_legacy})
+            _tcfg["additional_special_tokens"] = _merged
+            _tcfg_path.write_text(_json.dumps(_tcfg, indent=2))
+            print(f"[export] migrated legacy extra_special_tokens={_legacy} "
+                  f"into additional_special_tokens", file=sys.stderr)
     print("[export] done.", file=sys.stderr)
 
 
