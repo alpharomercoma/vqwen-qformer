@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "CLIP + Q-Former + Linear + Qwen3-4B — BLIP-2-style adapter bridged into a LLaVA-style LLM"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "torch==2.6.0",
+    "torch==2.8.0",
     "torchvision==0.21.0",
     "transformers>=4.51.0,<5",
     "accelerate>=1.0.0",
